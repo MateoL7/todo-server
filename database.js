@@ -1,3 +1,5 @@
+const { resolve } = require('path');
+
 const sqlite3 = require('sqlite3').verbose();
 
 const DBSOURCE = './todos.sqlite';
@@ -41,8 +43,6 @@ function asyncRemove(id) {
 function asyncInsert(text) {
   return new Promise((resolve, reject) => {
     var sql = `INSERT INTO todos (todo, done) VALUES ( '${text}' , false);`;
-    console.log(sql);
-
     var params = [];
 
     db.run(sql, params, function (err) {
@@ -61,13 +61,34 @@ function asyncInsert(text) {
 function asyncUpdate(done, id) {
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE TODOS SET done = ? WHERE ID = ?';
+    const sqlGet = 'SELECT * FROM TODOS WHERE id = ?';
     const params = [done, id];
-
-    db.run(sql, params, function (err) {
+    db.get(sqlGet, [id], (err, row) => {
       if (err) {
-        return reject(err);
+        reject(err);
+        return;
       }
-      resolve();
+      db.run(sql, params, function (err) {
+        if (err) {
+          return reject(err);
+        }
+        resolve({ id: row.id, text: row.todo, done: done });
+      });
+    });
+  });
+}
+
+function asyncItem(id) {
+  return new Promise((resolve, reject) => {
+    const sql = 'select * from todos where id = ?';
+    // console.log(sql);
+    const params = [id];
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(row);
     });
   });
 }
@@ -77,4 +98,5 @@ module.exports = {
   asyncRemove,
   asyncInsert,
   asyncUpdate,
+  asyncItem,
 };

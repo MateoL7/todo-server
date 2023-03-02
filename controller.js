@@ -7,6 +7,7 @@ const {
   asyncRemove,
   asyncInsert,
   asyncUpdate,
+  asyncItem,
 } = require('./database');
 
 const db = new sqlite3.Database(DBSOURCE, (err) => {
@@ -23,7 +24,13 @@ async function all(req, res) {
   }
 }
 
-function item() {
+async function item(req, res) {
+  try {
+    const row = await asyncItem(req.params.id);
+    res.status(200).json(row);
+  } catch (ex) {
+    res.status(500).json({ error: ex });
+  }
   return;
 }
 
