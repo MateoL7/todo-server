@@ -8,6 +8,12 @@
 GET http://localhost:3000/todos/
 ```
 
+## Obtener un _todo_
+
+```
+GET http://localhost:3000/todos/:ID
+```
+
 ## Añadir un _todo_
 
 ```
