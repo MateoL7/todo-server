@@ -21,12 +21,13 @@ function item(id) {
 }
 
 function insert(text) {
-  const stm = db.prepare(
-    'INSERT INTO todos (id, text, done) VALUES (id = ?, text = ?, done = false)'
-  );
-  console.log('SQL: ', stm);
-  const rows = stm.run(this.id, text);
-  return rows;
+  try {
+    const stm = db.prepare('INSERT INTO todos (todo, done) VALUES (?, ?)');
+    const rows = stm.run(text, 0);
+    return rows;
+  } catch (ex) {
+    console.log(ex);
+  }
 }
 
 function update(id, done) {
