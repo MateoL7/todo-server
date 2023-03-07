@@ -17,11 +17,17 @@ function remove(id) {
 function item(id) {
   const stm = db.prepare('SELECT * FROM todos WHERE id = ?');
   const rows = stm.get(id);
-  console.log('ROWS: ', rows);
   return rows;
 }
 
-function insert(text) {}
+function insert(text) {
+  const stm = db.prepare(
+    'INSERT INTO todos (id, text, done) VALUES (id = ?, text = ?, done = false)'
+  );
+  console.log('SQL: ', stm);
+  const rows = stm.run(this.id, text);
+  return rows;
+}
 
 function update(id, done) {
   if (done) {
@@ -37,7 +43,7 @@ function update(id, done) {
 module.exports = {
   all,
   remove,
-  // insert,
+  insert,
   update,
   item,
 };
