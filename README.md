@@ -1,20 +1,15 @@
-```js
+## Entrega ToDO Server Better Sqlite3
 
-const data = [
-{ id: 1, text: "npm init", done: true },
-{ id: 2, text: "npm i express", done: true },
-{ id: 3, text: "npm i -D nodemon", done: false },
-{ id: 4, text: "npm i cors", done: false },
-];
+**Autor:** Mateo Loaiza
 
-```
+## Obtener todos los _todo_
 
-## Obtener todos los *todo*
 ```
 GET http://localhost:3000/todos/
 ```
 
-## Añadir un *todo*
+## Añadir un _todo_
+
 ```
 POST http://localhost:3000/todos/
 {
@@ -23,6 +18,7 @@ POST http://localhost:3000/todos/
 ```
 
 ## Modificar el estado de un todo
+
 ```
 PUT http://localhost:3000/todos/:ID
 {
