@@ -1,10 +1,11 @@
 // const { asyncAll, asyncRemove, asyncItem } = require("./database.js");
-const db = require("../daos/users.dao.js");
+const db = require('../daos/users.dao.js');
 
 // new async/await syntax:
 async function all(req, res) {
   try {
     const rows = await db.all();
+    // Eliminar el password de rows
     res.json(rows);
   } catch (ex) {
     res.status(500).json({ error: err });
@@ -14,6 +15,7 @@ async function all(req, res) {
 async function item(req, res) {
   try {
     const row = await db.item(req.params.id);
+    // Eliminar el password de rows
     res.json(row);
   } catch (ex) {
     res.status(500).json({ error: ex });

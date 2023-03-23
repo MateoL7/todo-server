@@ -7,13 +7,19 @@ function all() {
   const stm = db.prepare('SELECT * FROM users');
   const rows = stm.all();
 
-  return rows;
+  return rows.map((row) => deletePassword(row));
 }
 
 function item(id) {
   const stm = db.prepare('SELECT * FROM users WHERE id = ?');
-  const rows = stm.get(id);
-  return rows;
+  const row = stm.get(id);
+
+  return deletePassword(row);
+}
+
+function deletePassword(row) {
+  delete row.password;
+  return row;
 }
 
 function getByUsername(username) {
