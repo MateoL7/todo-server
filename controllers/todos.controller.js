@@ -1,5 +1,5 @@
 // const { asyncAll, asyncRemove, asyncItem } = require("./database.js");
-const db = require("../daos/todos.dao");
+const db = require('../daos/todos.dao');
 
 // new async/await syntax:
 async function all(req, res) {
@@ -12,7 +12,7 @@ async function all(req, res) {
 }
 
 async function allTodosByUser(req, res, next) {
-  console.log("alltodosbyuser", req.USER_ID);
+  console.log('alltodosbyuser', req.USER_ID);
   try {
     const id = req.USER_ID;
     const rows = await db.allTodosByUser(id);
@@ -32,35 +32,18 @@ async function item(req, res) {
 }
 
 async function insert(req, res) {
-  //   var sql = `INSERT INTO todos (todo, done) VALUES ( '${req.body.text}' , false);`;
-  //   console.log(sql);
-  //   var params = [];
-  //   db.run(sql, params, function (err) {
-  //     console.log(this);
-  //     console.log(err);
-  //     if (err) {
-  //       console.log(err);
-  //       res.status(400).json({ error: err.message });
-  //       return;
-  //     }
-  //     res.json({
-  //       id: this.lastID,
-  //       text: req.body.text,
-  //       done: false,
-  //     });
-  //   });
-  res.json({});
+  try {
+    await db.insert(req.body);
+    res.status(200).json({ Status: 'Inserted' });
+  } catch (ex) {
+    res.status(500).json({ error: ex });
+  }
 }
-// PUT /todos/4587487
-// {
-//   done: true;
-// }
+
 async function update(req, res) {
   try {
     const { id } = req.params;
-    const { done } = req.body;
-
-    await db.update(id, done);
+    await db.update(id, req.body);
     res.status(200).json({});
   } catch (ex) {
     res.status(500).json({ error: ex });
@@ -80,16 +63,16 @@ async function remove(req, res) {
   return;
 }
 
-async function removeQString(req, res) {
-  try {
-    await db.remove(req.query.id);
-    res.status(200).json({});
-  } catch (ex) {
-    res.status(500).json({ error: ex });
-  }
+// async function removeQString(req, res) {
+//   try {
+//     await db.remove(req.query.id);
+//     res.status(200).json({});
+//   } catch (ex) {
+//     res.status(500).json({ error: ex });
+//   }
 
-  return;
-}
+//   return;
+// }
 
 module.exports = {
   all,
