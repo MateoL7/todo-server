@@ -71,3 +71,9 @@ PUT http://localhost:3000/users/:ID
     "email": "gmail.com"
 }
 ```
+
+## Borrado de un _user_
+
+```
+DELETE http://localhost:3000/users/:ID
+```
