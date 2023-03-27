@@ -13,7 +13,10 @@ GET http://localhost:3000/users/id/todos
 ```
 POST http://localhost:3000/todos/
 {
-  text: "nuevo todo"
+        "user_id": 1,
+        "title": "Todo nuevo",
+        "description": "Todo nuevo description",
+        "done": false
 }
 ```
 

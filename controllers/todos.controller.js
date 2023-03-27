@@ -12,7 +12,6 @@ async function all(req, res) {
 }
 
 async function allTodosByUser(req, res, next) {
-  console.log('alltodosbyuser', req.USER_ID);
   try {
     const id = req.USER_ID;
     const rows = await db.allTodosByUser(id);
