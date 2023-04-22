@@ -9,6 +9,8 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+const TTL_JWT = Number(process.env.TTL_JWT) ?? 60;
+
 const bcrypt = require('bcrypt');
 
 // registrar usuario
@@ -30,6 +32,7 @@ app.post('/register', (req, res, next) => {
       });
     });
   });
+  res.status(200).json({ Mensaje: 'Exito' });
 });
 
 app.post('/login', (req, res, next) => {
@@ -47,7 +50,11 @@ app.post('/login', (req, res, next) => {
     // Generar token para mandar al cliente
     var jwt = require('jsonwebtoken');
     var token = jwt.sign(
-      { id: userFound.id, name: userFound.name },
+      {
+        id: userFound.id,
+        name: userFound.name,
+        exp: new Date() / 1000 + TTL_JWT,
+      },
       process.env.PASSWORD_JWT
     );
     res.status(200).json({ token: token });

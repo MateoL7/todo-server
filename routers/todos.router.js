@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const {
   all,
   allTodosByUser,
@@ -6,15 +6,21 @@ const {
   update,
   insert,
   remove,
-} = require("../controllers/todos.controller");
+} = require('../controllers/todos.controller');
 
 const router = express.Router();
 // const router = express.Router({ mergeParams: true });
 
-router.get("/", allTodosByUser);
-router.get("/:id", item);
-router.post("/", insert);
-router.delete("/:id", remove);
-router.put("/:id", update);
+// const authentication = require('../middlewares/authentication');
+const authorization = require('../middlewares/authorization');
+
+// router.use(authentication);
+router.use(authorization);
+
+router.get('/', allTodosByUser);
+router.get('/:id', item);
+router.post('/', insert);
+router.delete('/:id', remove);
+router.put('/:id', update);
 
 module.exports = router;
