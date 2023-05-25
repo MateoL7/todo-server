@@ -1,69 +1,90 @@
+require("dotenv").config();
 const express = require("express");
+
 const cors = require("cors");
-const uuid = require("uuid").v4;
 
 const app = express();
 const port = 3000;
 
+const TTL_JWT = Number(process.env.TTL_JWT) ?? 10;
+
 app.use(cors());
 app.use(express.json());
 
-const data = [
-  { id: uuid(), text: "npm init", done: true },
-  { id: uuid(), text: "npm i express", done: true },
-  { id: uuid(), text: "npm i -D nodemon", done: true },
-  { id: uuid(), text: "npm i cors", done: false },
-  { id: uuid(), text: "npm i uuid", done: false },
-];
+// registrar usuario
+app.post("/register", (req, res, next) => {
+  const { login, password, nombre, email } = req.body;
 
-app.get("/todos", (req, res) => {
-  console.log("get all");
-  res.json(data);
+  const bcrypt = require("bcrypt");
+  const saltRounds = 10;
+  const myPlaintextPassword = password;
+
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(myPlaintextPassword, salt, function (err, hash) {
+      // Store hash in your password DB.
+
+      const userDAO = require("./daos/users.dao");
+
+      userDAO.insert({
+        username: login,
+        password: hash,
+        name: nombre,
+        email: email,
+      });
+
+      res.json(201).json({ mensaje: "usuario creado" });
+    });
+  });
+});
+// login
+
+app.post("/login", (req, res, next) => {
+  const { login, password } = req.body;
+
+  const bcrypt = require("bcrypt");
+
+  const userDAO = require("./daos/users.dao");
+
+  const userFound = userDAO.getByUsername(login);
+
+  //login incorrecto
+  if (!userFound) return next("login incorrecto");
+
+  if (bcrypt.compareSync(password, userFound.password)) {
+    // login correcto
+
+    // generar un token que voy a enviar a cliente.
+    var jwt = require("jsonwebtoken");
+    try {
+      var token = jwt.sign(
+        {
+          id: userFound.id,
+          name: userFound.name,
+          exp: new Date() / 1000 + TTL_JWT,
+        },
+        process.env.PASSWORD_JWT
+      );
+
+      res.status(200).json({ token: token });
+    } catch (ex) {
+      console.log(ex);
+    }
+  } else {
+    // login incorrecto
+    return next("login incorrecto");
+  }
 });
 
-app.get("/todos/:id", (req, res) => {
-  const { id } = req.params;
-  console.log("get one", id);
-  const todo = data.find((todo) => todo.id === id);
-  res.json(todo);
+const usersRouter = require("./routers/users.router.js");
+
+app.use("/users", usersRouter);
+
+app.all("*", (req, res) => {
+  res.status(404).json({ error: "esta no es la página que estabas buscando" });
 });
 
-app.post("/todos", (req, res) => {
-  console.log("post");
-  const { text } = req.body;
-  const newTodo = {
-    id: uuid(),
-    text,
-    done: false,
-  };
-  data.push(newTodo);
-  res.json(newTodo);
-});
-
-app.patch("/todos/:id", (req, res) => {
-  console.log("patch");
-  const { id } = req.params;
-  const { done } = req.body;
-  const todo = data.find((todo) => todo.id === id);
-  todo.done = done;
-  res.json(todo);
-});
-
-app.put("/todos/:id", (req, res) => {
-  console.log("put");
-  const { id } = req.params;
-  const { done } = req.body;
-  const todo = data.find((todo) => todo.id === id);
-  todo.done = done;
-  res.json(todo);
-});
-
-app.delete("/todos/:id", (req, res) => {
-  console.log("delete");
-  const { id } = req.params;
-  const todo = data.find((todo) => todo.id === id);
-  data.splice(data.indexOf(todo), 1);
-  res.json(todo);
+app.use((error, req, res, next) => {
+  res.status(401).json({ message: error });
 });
 
 app.listen(port, () => {
